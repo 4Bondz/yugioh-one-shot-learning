@@ -28,20 +28,20 @@ import pickle
 import models_lpf.resnet as mod_res
 
 
-useGPU = True
+useGPU = False
 enableEval = False
 #enableEval = True
 
-targetDirName = './cardDatabaseFull/'
+targetDirName = 'cardDatabaseFull/'
 assert os.path.exists(targetDirName)
 
-loadPath = './savedModels/res-withShift-150-072020.pth'
+loadPath = 'savedModels/res-withShift-150-072020.pth'
 
 
 assert os.path.exists(loadPath)
 
 
-dictPath = './savedModels/featureMap-withShift-150-072020.pkl'
+dictPath = 'savedModels/featureMap-withShift-150-072020.pkl'
 
 assert os.path.exists(dictPath)
 
@@ -106,12 +106,12 @@ imagePath0 = './data/cards/training/dark-magician/0.jpg'
 
 #imagePath0 = './test-input/bewd_0.png'
 groundTruthPath = targetDirName + 'BlueEyes-White-Dragon-1-89631139/896311391.jpg'
-imagePath0 = './test-input/bewd_dd.png'
+imagePath0 = 'test-input/bewd.jpg'
 
 assert os.path.exists(imagePath0)
 assert os.path.exists(groundTruthPath)
 
-cardName = groundTruthPath.split('/')[2]
+cardName = groundTruthPath.split('/')[1]
 
 
 """## Helper functions
@@ -246,7 +246,7 @@ class TripletLoss(nn.Module):
         return losses.mean() if size_average else losses.sum()
 
 """## Training Time!"""
-net = SiameseNetwork().cuda()
+net = SiameseNetwork()
 margin = 2.
 criterion = TripletLoss(margin)
 
@@ -264,7 +264,7 @@ net = nn.DataParallel(net,device_ids=[0])
 
 
 
-net.load_state_dict(torch.load(loadPath))
+net.load_state_dict(torch.load(loadPath,  map_location=torch.device('cpu')))
 
 
 if enableEval:
@@ -353,7 +353,7 @@ def compareNCards(imgPath0,imgPath1,targetDirName,n_compare=10):
 
 # Construct a dictionary of features maps, and save is
 
-targetDirName = './cardDatabaseFull/'
+targetDirName = 'cardDatabaseFull/'
 
 featureMapList = {}
 dim = (244,244)
@@ -367,6 +367,7 @@ limitCnt = 0
 #####
 # We check for model / dictionary mismatch
 #####
+
 featureMapDict = pickle.load(open(dictPath, 'rb'))
 print(dictPath)
 print(loadPath)
